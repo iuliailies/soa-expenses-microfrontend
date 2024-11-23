@@ -9,8 +9,7 @@ const useAddExpense = () => {
     setLoading(true);
     try {
       const response = await apiClient.post('/api/expenses', expense, {
-        // headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-        headers: { Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzIzNjg1NDEsInVzZXJfaWQiOjF9.5fajBoeIUiDQgAZiBYj0qOAySEkbTh97P8-fpyt8v6Y` },
+        headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
       });
       setError(null);
       return response.data; // Return the created expense

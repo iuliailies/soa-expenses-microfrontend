@@ -1,9 +1,12 @@
 import ExpenseList from "./components/ExpenseList";
+import WeeklyLimitEditor from "./components/WeeklyLimitEditor";
 
 const Root: React.FC = () => {
   return (
     <div>
-    <ExpenseList />
+      {/* TODO: get user current limit from API */}
+      <WeeklyLimitEditor initialLimit={500}/>
+      <ExpenseList />
   </div>
   );
 }

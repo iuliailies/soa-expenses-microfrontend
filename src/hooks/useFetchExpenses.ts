@@ -12,8 +12,7 @@ const useFetchExpenses = () => {
       setLoading(true);
       try {
         const response = await apiClient.get('/api/expenses', {
-            // headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-          headers: { Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzIzNjg1NDEsInVzZXJfaWQiOjF9.5fajBoeIUiDQgAZiBYj0qOAySEkbTh97P8-fpyt8v6Y` },
+          headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
         });
         setExpenses(response.data);
         setError(null);
