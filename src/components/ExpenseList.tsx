@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import useFetchExpenses from '../hooks/useFetchExpenses';
 import useAddExpense from '../hooks/useAddExpense';
+import useDeleteExpense from '../hooks/useDeleteExpense';
 import { format } from 'date-fns';
 import PhantomRow from './PhantomRow';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 const Section = styled.section`
   padding: 20px;
@@ -18,7 +21,12 @@ const Table = styled.table`
   border-collapse: collapse;
 `;
 
-const TableRow = styled.tr``;
+const TableRow = styled.tr`
+  position: relative;
+  &:hover .delete-icon {
+    visibility: visible;
+  }
+`;
 
 const TableHeader = styled.th`
   border-bottom: 1px solid #ddd;
@@ -32,35 +40,98 @@ const TableCell = styled.td`
 `;
 
 const AddButton = styled.button`
+  display: flex;
+  align-items: center;
   background-color: #007bff;
   color: white;
   padding: 10px 20px;
   border: none;
+  border-radius: 5px;
   cursor: pointer;
   margin-top: 20px;
-  display: block;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #2d5d91;
+  }
+
+  svg {
+    margin-right: 8px;
+    font-size: 18px;
+  }
+`;
+
+const DeleteIcon = styled(FontAwesomeIcon)`
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  visibility: hidden;
+  color: red;
+  font-size: 18px;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: darkred;
+  }
 `;
 
 const ExpenseList: React.FC = () => {
-  const { expenses, loading, error } = useFetchExpenses();
+  const { fetchExpenses } = useFetchExpenses();
   const { addExpense } = useAddExpense();
+  const { deleteExpense } = useDeleteExpense();
+
+  const [expenses, setExpenses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
 
-  const handleSave = async (category: string, amount: number) => {
-    const newExpense = {
-      category,
-      amount,
-      date: new Date().toISOString(),
+  useEffect(() => {
+    const loadExpenses = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchExpenses();
+        setExpenses(data);
+        setError(null);
+      } catch (err) {
+        setError(err.message || 'Failed to load expenses');
+      } finally {
+        setLoading(false);
+      }
     };
-    const savedExpense = await addExpense(newExpense);
-    if (savedExpense) {
-      expenses.push(savedExpense); // Update the local expenses list
+
+    loadExpenses();
+  }, []);
+
+  const handleSave = async (category: string, amount: number) => {
+    try {
+      const newExpense = {
+        category,
+        amount,
+        date: new Date().toISOString(),
+      };
+      const savedExpense = await addExpense(newExpense);
+      setExpenses((prevExpenses) => [...prevExpenses, savedExpense]);
       setIsAdding(false);
+    } catch (err) {
+      console.error('Error adding expense:', err);
     }
   };
 
   const handleDiscard = () => {
     setIsAdding(false);
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteExpense(id);
+      setExpenses((prevExpenses) =>
+        prevExpenses.filter((expense) => expense.id !== id)
+      );
+    } catch (err) {
+      console.error('Error deleting expense:', err);
+    }
   };
 
   if (loading) return <p>Loading...</p>;
@@ -85,6 +156,11 @@ const ExpenseList: React.FC = () => {
               <TableCell>{expense.category}</TableCell>
               <TableCell>${expense.amount}</TableCell>
               <TableCell>{format(new Date(expense.date), 'MMMM dd, yyyy')}</TableCell>
+              <DeleteIcon
+                className="delete-icon"
+                icon={faTrash}
+                onClick={() => handleDelete(expense.id)}
+              />
             </TableRow>
           ))}
           {isAdding && (
@@ -93,7 +169,10 @@ const ExpenseList: React.FC = () => {
         </tbody>
       </Table>
       {!isAdding && (
-        <AddButton onClick={() => setIsAdding(true)}>+ Add Expense</AddButton>
+        <AddButton onClick={() => setIsAdding(true)}>
+          <FontAwesomeIcon icon={faPlus} />
+          Add Expense
+        </AddButton>
       )}
     </Section>
   );
