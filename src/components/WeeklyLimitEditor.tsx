@@ -122,6 +122,14 @@ const WeeklyLimitEditor: React.FC = () => {
     setIsEditing(true);
   };
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    console.log("here")
+    if (event.key === "Enter") {
+      event.preventDefault(); 
+      handleSave();
+    }
+  };
+
   if (loading) return <p>Loading weekly limit...</p>;
   if (error) return <p>{error}</p>;
 
@@ -134,6 +142,7 @@ const WeeklyLimitEditor: React.FC = () => {
         ref={limitRef}
         onFocus={handleFocus}
         highlight={highlight}
+        onKeyDown={handleKeyDown} 
       >
         {currentLimit}
       </EditableField>
