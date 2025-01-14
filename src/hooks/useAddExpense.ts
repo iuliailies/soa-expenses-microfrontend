@@ -12,7 +12,7 @@ const useAddExpense = () => {
         headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` },
       });
       setError(null);
-      return response.data; // Return the created expense
+      return response.data;
     } catch (err) {
       setError('Failed to add expense');
       return null;

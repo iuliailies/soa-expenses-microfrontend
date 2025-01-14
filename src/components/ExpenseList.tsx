@@ -124,6 +124,9 @@ const ExpenseList: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this expense?');
+    if (!confirmDelete) return;
+
     try {
       await deleteExpense(id);
       setExpenses((prevExpenses) =>

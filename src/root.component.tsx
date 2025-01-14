@@ -2,6 +2,7 @@ import styled from "styled-components";
 import ExpenseList from "./components/ExpenseList";
 import LogoutButton from "./components/LogoutButton";
 import WeeklyLimitEditor from "./components/WeeklyLimitEditor";
+import NotificationDisplay from "./components/NotificationDisplay";
 
 const Header = styled.div`
   display: flex;
@@ -18,6 +19,7 @@ const Root: React.FC = () => {
         <LogoutButton/>
       </Header>
       <ExpenseList />
+      <NotificationDisplay/>
   </div>
   );
 }
